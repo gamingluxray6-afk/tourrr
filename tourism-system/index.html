@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naguilan Tourism Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-mountain"></i>
+                <h1>Naguilan Tourism Management</h1>
+            </div>
+            <nav>
+                <ul id="navigation-menu">
+                    <li><a href="#" class="active" data-page="dashboard">Dashboard</a></li>
+                    <li><a href="#" data-page="records">Records</a></li>
+                    <li><a href="#" data-page="analytics">Analytics</a></li>
+                    <li><a href="#" data-page="map">Map</a></li>
+                    <li><a href="#" data-page="settings">Settings</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <h2>Quick Actions</h2>
+                
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <h3 id="user-name">John Tourist</h3>
+                        <p id="user-role">Tourist Guide</p>
+                        <div class="points-balance">
+                            <i class="fas fa-coins"></i> <span id="points-count">1,250</span> Points
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <button class="action-btn" id="add-record-btn">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Add Record</span>
+                    </button>
+                    <button class="action-btn" id="analytics-btn">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </button>
+                    <button class="action-btn" id="explore-btn">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Explore Map</span>
+                    </button>
+                    <button class="action-btn" id="redeem-btn">
+                        <i class="fas fa-gift"></i>
+                        <span>Redeem Points</span>
+                    </button>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <h2>Recent Activity</h2>
+                    <div class="activity-list">
+                        <div class="activity-item" style="padding: 10px; border-bottom: 1px solid #eee;">
+                            <p>New record added</p>
+                            <small>2 hours ago</small>
+                        </div>
+                        <div class="activity-item" style="padding: 10px; border-bottom: 1px solid #eee;">
+                            <p>Points redeemed</p>
+                            <small>Yesterday</small>
+                        </div>
+                        <div class="activity-item" style="padding: 10px;">
+                            <p>Analytics generated</p>
+                            <small>May 25, 2026</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-area">
+                <!-- Dashboard View -->
+                <div id="dashboard-view" class="page-content active">
+                    <div class="dashboard-cards">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon icon-blue">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="card-title">Total Visitors</div>
+                            </div>
+                            <div class="card-value">12,489</div>
+                            <div class="card-stats">
+                                <span class="positive">+12.5%</span> from last month
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon icon-green">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="card-title">Attractions</div>
+                            </div>
+                            <div class="card-value">24</div>
+                            <div class="card-stats">
+                                <span class="positive">+3</span> new attractions
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon icon-yellow">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                <div class="card-title">Points Collected</div>
+                            </div>
+                            <div class="card-value">45,670</div>
+                            <div class="card-stats">
+                                <span class="positive">+8.2%</span> from last month
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon icon-red">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <div class="card-title">Events This Month</div>
+                            </div>
+                            <div class="card-value">5</div>
+                            <div class="card-stats">
+                                <span class="negative">-2</span> from last month
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tourist-info-section">
+                        <h2>Your Tourism Guide</h2>
+                        <div class="tourist-info">
+                            <p>Welcome to Naguilan, La Union! As a tourist guide, you can track your visits to local attractions, earn points, and contribute to our tourism database.</p>
+                            <p>Your recent visits:</p>
+                            <ul>
+                                <li>Balete Hot Springs (visited May 20)</li>
+                                <li>Mount Data Trail (visited May 15)</li>
+                                <li>Local Delicacies Tour (visited May 10)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Records View -->
+                <div id="records-view" class="page-content">
+                    <h2>Tourism Records</h2>
+                    <div class="records-table-container">
+                        <table class="records-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Visitor Name</th>
+                                    <th>Attraction</th>
+                                    <th>Guide</th>
+                                    <th>Points Earned</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>May 26, 2026</td>
+                                    <td>Sarah Johnson</td>
+                                    <td>Balete Hot Springs</td>
+                                    <td>John Tourist</td>
+                                    <td>150</td>
+                                </tr>
+                                <tr>
+                                    <td>May 25, 2026</td>
+                                    <td>Michael Chen</td>
+                                    <td>Mount Data</td>
+                                    <td>John Tourist</td>
+                                    <td>200</td>
+                                </tr>
+                                <tr>
+                                    <td>May 24, 2026</td>
+                                    <td>Emma Rodriguez</td>
+                                    <td>Local Delicacies</td>
+                                    <td>John Tourist</td>
+                                    <td>100</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Analytics View (Admin Only) -->
+                <div id="analytics-view" class="page-content">
+                    <div class="analytics-section">
+                        <div class="section-header">
+                            <h2>Tourism Analytics</h2>
+                            <div class="filter-controls">
+                                <select id="time-period">
+                                    <option>Monthly</option>
+                                    <option selected>Yearly</option>
+                                    <option>Quarterly</option>
+                                </select>
+                                <select id="year-select">
+                                    <option>2024</option>
+                                    <option selected>2025</option>
+                                    <option>2026</option>
+                                </select>
+                                <button id="analyze-btn"><i class="fas fa-chart-bar"></i> Analyze</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="analytics-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-data">
+                        <h3>Visitor Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h4>Peak Season</h4>
+                                <p>December - February</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>Average Stay</h4>
+                                <p>3.2 days</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>Top Attraction</h4>
+                                <p>Balete Hot Springs</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>Revenue Generated</h4>
+                                <p>₱1,240,500</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Map View -->
+                <div id="map-view" class="page-content">
+                    <div class="map-section">
+                        <div class="section-header">
+                            <h2>Explore Naguilan</h2>
+                            <div class="map-controls">
+                                <button><i class="fas fa-search-location"></i> Search</button>
+                                <button><i class="fas fa-filter"></i> Filter</button>
+                            </div>
+                        </div>
+                        <div id="tourism-map">
+                            <div class="map-overlay">
+                                <h3>Tourism Attractions</h3>
+                                <p>Select attractions to view details</p>
+                            </div>
+                            <!-- Map would be rendered here -->
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #777;">
+                                <i class="fas fa-map-marked-alt" style="font-size: 4rem; margin-bottom: 15px;"></i>
+                                <h3>Interactive Tourism Map</h3>
+                                <p>View attractions, trails, and points of interest in Naguilan</p>
+                            </div>
+                        </div>
+                        
+                        <h3 style="margin-top: 25px;">Popular Attractions</h3>
+                        <div class="attractions-grid">
+                            <div class="attraction-card">
+                                <div class="attraction-img">
+                                    <i class="fas fa-water"></i>
+                                </div>
+                                <div class="attraction-info">
+                                    <h3>Balete Hot Springs</h3>
+                                    <p>Relaxing natural hot springs</p>
+                                    <div class="attraction-meta">
+                                        <span><i class="fas fa-star"></i> 4.7</span>
+                                        <span><i class="fas fa-coins"></i> 150 pts</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="attraction-card">
+                                <div class="attraction-img">
+                                    <i class="fas fa-tree"></i>
+                                </div>
+                                <div class="attraction-info">
+                                    <h3>Mount Data</h3>
+                                    <p>Hiking and nature trails</p>
+                                    <div class="attraction-meta">
+                                        <span><i class="fas fa-star"></i> 4.5</span>
+                                        <span><i class="fas fa-coins"></i> 200 pts</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="attraction-card">
+                                <div class="attraction-img">
+                                    <i class="fas fa-utensils"></i>
+                                </div>
+                                <div class="attraction-info">
+                                    <h3>Local Delicacies</h3>
+                                    <p>Traditional Ilocano cuisine</p>
+                                    <div class="attraction-meta">
+                                        <span><i class="fas fa-star"></i> 4.8</span>
+                                        <span><i class="fas fa-coins"></i> 100 pts</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="attraction-card">
+                                <div class="attraction-img">
+                                    <i class="fas fa-hiking"></i>
+                                </div>
+                                <div class="attraction-info">
+                                    <h3>Cave Exploration</h3>
+                                    <p>Historical caves and formations</p>
+                                    <div class="attraction-meta">
+                                        <span><i class="fas fa-star"></i> 4.6</span>
+                                        <span><i class="fas fa-coins"></i> 180 pts</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings View -->
+                <div id="settings-view" class="page-content">
+                    <h2>User Settings</h2>
+                    <div class="settings-section">
+                        <h3>Profile Information</h3>
+                        <div class="input-group">
+                            <label for="profile-name">Name</label>
+                            <input type="text" id="profile-name" value="John Tourist">
+                        </div>
+                        <div class="input-group">
+                            <label for="profile-email">Email</label>
+                            <input type="email" id="profile-email" value="john@tourist.com">
+                        </div>
+                        <button class="btn-primary">Update Profile</button>
+                    </div>
+                    
+                    <div class="settings-section" style="margin-top: 30px;">
+                        <h3>Security</h3>
+                        <button class="btn-primary">Change Password</button>
+                        <button class="btn-primary" style="background: #e74c3c; margin-left: 10px;">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Login Form -->
+    <div class="login-container" id="loginForm">
+        <div class="form-container">
+            <span class="close-form" id="closeLogin">&times;</span>
+            <h2>Login to Your Account</h2>
+            <div class="input-group">
+                <label for="login-email">Email Address</label>
+                <input type="email" id="login-email" placeholder="Enter your email">
+            </div>
+            <div class="input-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password">
+            </div>
+            <button class="btn-primary" id="login-submit">Login</button>
+            <div class="form-footer">
+                <p>Don't have an account? <a href="#" id="showSignup">Sign Up</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Signup Form -->
+    <div class="signup-container" id="signupForm">
+        <div class="form-container">
+            <span class="close-form" id="closeSignup">&times;</span>
+            <h2>Create New Account</h2>
+            <div class="input-group">
+                <label for="signup-name">Full Name</label>
+                <input type="text" id="signup-name" placeholder="Enter your full name">
+            </div>
+            <div class="input-group">
+                <label for="signup-email">Email Address</label>
+                <input type="email" id="signup-email" placeholder="Enter your email">
+            </div>
+            <div class="input-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" placeholder="Create a password">
+            </div>
+            <div class="input-group">
+                <label for="signup-confirm">Confirm Password</label>
+                <input type="password" id="signup-confirm" placeholder="Confirm your password">
+            </div>
+            <button class="btn-primary" id="signup-submit">Sign Up</button>
+            <div class="form-footer">
+                <p>Already have an account? <a href="#" id="showLogin">Login</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        Action completed successfully!
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
