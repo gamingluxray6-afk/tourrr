@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourgo - Naguilian Tourism Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <meta name="theme-color" content="#0d9488">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div id="notification" class="notification"></div>
+
+    <!-- AI CHATBOT -->
+    <button id="ai-chat-btn" class="ai-chat-fab"><i class="fas fa-robot"></i><span class="chat-label">Tourism AI</span></button>
+    <div id="ai-chat-panel" class="ai-chat-panel">
+        <div class="chat-header">
+            <div class="chat-header-info"><div class="ai-avatar"><i class="fas fa-robot"></i></div><div><h3>Naguilian Tourism AI</h3><p id="chat-role-label">Your Local Expert</p></div></div>
+            <button id="close-chat-panel" class="close-chat-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="chat-message ai"><div class="message-avatar"><i class="fas fa-robot"></i></div><div class="message-content"><p id="ai-welcome-msg">Kumusta! I know everything about Naguilian. Ask me about our history, food, spots, or culture!</p><span class="message-time">Just now</span></div></div>
+        </div>
+        <div class="chat-suggestions" id="chat-suggestions"></div>
+        <div class="chat-input-area"><input type="text" id="chat-input" placeholder="Ask about Naguilian..."><button id="send-chat-btn"><i class="fas fa-paper-plane"></i></button></div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-container" class="auth-container active">
+        <div class="form-container">
+            <button id="closeLogin" class="close-form"><i class="fas fa-times"></i></button>
+            <div class="auth-logo"><i class="fas fa-compass"></i></div>
+            <h2>Welcome to Tourgo</h2><p class="auth-subtitle">Sign in to continue your journey</p>
+            <div class="input-group"><label>Email</label><input type="email" id="login-email" required></div>
+            <div class="input-group"><label>Password</label><input type="password" id="login-password" required></div>
+            <button id="login-submit" class="btn-primary">Sign In</button>
+            <div class="form-footer"><p>Don't have an account? <a href="#" id="showSignup">Sign Up</a></p><p class="demo-hint">Demo: admin@tourgo.com / admin123</p></div>
+        </div>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="signup-container" class="auth-container">
+        <div class="form-container">
+            <button id="closeSignup" class="close-form"><i class="fas fa-times"></i></button>
+            <div class="auth-logo"><i class="fas fa-compass"></i></div>
+            <h2>Create Account</h2>
+            <div class="input-group"><label>Name</label><input type="text" id="signup-name" required></div>
+            <div class="input-group"><label>Email</label><input type="email" id="signup-email" required></div>
+            <div class="input-group"><label>Password</label><input type="password" id="signup-password" required></div>
+            <div class="input-group"><label>Confirm</label><input type="password" id="signup-confirm" required></div>
+            <button id="signup-submit" class="btn-primary">Create Account</button>
+            <div class="form-footer"><p>Already have an account? <a href="#" id="showLogin">Sign In</a></p></div>
+        </div>
+    </div>
+
+    <!-- DELETE MODAL -->
+    <div id="delete-modal" class="modal">
+        <div class="modal-content warning-modal">
+            <i class="fas fa-exclamation-triangle warning-icon"></i><h3>Confirm Deletion</h3><p>Are you sure?</p>
+            <div class="modal-actions"><button id="cancel-delete" class="btn-secondary">Cancel</button><button id="confirm-delete" class="btn-danger">Delete</button></div>
+        </div>
+    </div>
+
+    <!-- EDIT RECORD PANEL -->
+    <div id="edit-panel" class="slide-panel">
+        <div class="panel-header"><h3>Edit Record</h3><button id="close-edit-panel" class="close-panel-btn"><i class="fas fa-times"></i></button></div>
+        <div class="panel-body">
+            <form id="edit-form">
+                <input type="hidden" id="edit-id">
+                <div class="input-group"><label>Location</label><input type="text" id="edit-location" required></div>
+                <div class="input-group"><label>Visitors</label><input type="number" id="edit-visitors" required></div>
+                <div class="input-group"><label>Date</label><input type="date" id="edit-date" required></div>
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PROFILE MODAL -->
+    <div id="profile-modal" class="modal">
+        <div class="modal-content profile-modal-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="color: var(--primary);"><i class="fas fa-user-circle"></i> Edit Profile</h3>
+                <button class="close-modal-btn" id="close-profile-modal" style="font-size: 1.5rem; cursor: pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="profile-form">
+                <div class="profile-avatar-section">
+                    <img id="profile-avatar-preview" src="https://i.pravatar.cc/150?u=ken" class="profile-avatar-large">
+                    <div style="margin-top: 10px;">
+                        <label class="profile-avatar-upload" for="profile-avatar-input"><i class="fas fa-camera"></i> Change Photo</label>
+                        <input type="file" id="profile-avatar-input" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+                <div class="input-group"><label>Full Name</label><input type="text" id="profile-name" required></div>
+                <div class="input-group"><label>Email</label><input type="email" id="profile-email" required></div>
+                <div class="input-group"><label>Phone Number</label><input type="tel" id="profile-phone" placeholder="+63 9XX XXX XXXX"></div>
+                <div class="input-group"><label>New Password (leave blank to keep current)</label><input type="password" id="profile-password" placeholder="••••••••"></div>
+                <button type="submit" class="btn-primary">Save Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- QR SCANNER MODAL -->
+    <div id="qr-scanner-modal" class="modal">
+        <div class="modal-content qr-scanner-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="color: var(--primary);"><i class="fas fa-qrcode"></i> <span id="qr-scanner-title">Scan QR Code</span></h3>
+                <button class="close-modal-btn" id="close-qr-scanner" style="font-size: 1.5rem; cursor: pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="qr-reader" style="width: 100%; border-radius: 12px; overflow: hidden; min-height: 300px;"></div>
+            <div id="qr-result" style="margin-top: 15px; padding: 15px; background: var(--light); border-radius: 10px; display: none;"></div>
+            <p style="color: var(--gray); font-size: 0.85rem; margin-top: 10px; text-align: center;" id="qr-instruction">Point your camera at the spot's QR code to earn points</p>
+        </div>
+    </div>
+
+    <!-- QR GENERATOR MODAL (Admin) -->
+    <div id="qr-generator-modal" class="modal">
+        <div class="modal-content qr-generator-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="color: var(--primary);"><i class="fas fa-qrcode"></i> Generate Spot QR Code</h3>
+                <button class="close-modal-btn" id="close-qr-generator" style="font-size: 1.5rem; cursor: pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="qr-generator-body">
+                <div class="qr-preview-section">
+                    <img id="qr-generator-image" src="" alt="QR Code" style="width: 250px; height: 250px; border-radius: 12px; border: 3px solid var(--primary); padding: 10px; background: white;">
+                    <div class="qr-info-box">
+                        <h4 id="qr-generator-spot-name">Spot Name</h4>
+                        <p id="qr-generator-spot-location" style="color: var(--gray); font-size: 0.9rem;"><i class="fas fa-map-marker-alt"></i> Location</p>
+                        <p id="qr-generator-spot-points" style="color: var(--primary); font-weight: 700; margin-top: 8px;"><i class="fas fa-coins"></i> <span id="qr-points-value">0</span> Points</p>
+                    </div>
+                </div>
+                <div class="qr-instructions">
+                    <h4><i class="fas fa-info-circle"></i> How to Use This QR Code</h4>
+                    <ol>
+                        <li>Download and print this QR code</li>
+                        <li>Place it at the physical tourist spot location</li>
+                        <li>Tourists will scan it to verify their visit</li>
+                        <li>Points are automatically awarded after scanning</li>
+                    </ol>
+                </div>
+                <div class="qr-actions">
+                    <button class="btn-primary" id="download-qr-btn"><i class="fas fa-download"></i> Download QR Code</button>
+                    <button class="btn-secondary" id="print-qr-btn"><i class="fas fa-print"></i> Print QR Code</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REDEEM MODAL -->
+    <div id="redeem-modal" class="modal">
+        <div class="modal-content clean-modal-box">
+            <div class="clean-header"><div class="header-text"><h2>Redeem Rewards</h2></div><button class="close-clean" id="close-redeem-modal"><i class="fas fa-times"></i></button></div>
+            <div class="clean-balance"><div class="balance-icon"><i class="fas fa-coins"></i></div><div class="balance-text"><span class="label">Points</span><span class="amount" id="modal-points-count">0</span></div></div>
+            <div class="clean-rewards-grid">
+                <div class="clean-card" data-cost="500" data-reward="Free Water Bottle"><div class="card-icon bg-teal"><i class="fas fa-tint"></i></div><div class="card-details"><h4>Water Bottle</h4><span class="card-cost">500 Pts</span></div><button class="btn-clean-redeem">Redeem</button></div>
+                <div class="clean-card" data-cost="5000" data-reward="Free Local Trip"><div class="card-icon bg-orange"><i class="fas fa-map-marked-alt"></i></div><div class="card-details"><h4>Local Trip</h4><span class="card-cost">5,000 Pts</span></div><button class="btn-clean-redeem">Redeem</button></div>
+            </div>
+            <div class="redeem-footer-info"><div class="info-icon"><i class="fas fa-info-circle"></i></div><div class="info-text"><strong>How to claim:</strong> Visit the Naguilian Tourism Office and show your QR code.</div></div>
+        </div>
+    </div>
+
+    <!-- TICKETS MODAL -->
+    <div id="tickets-modal" class="modal">
+        <div class="modal-content clean-modal-box">
+            <div class="clean-header"><div class="header-text"><h2>Tourism Tickets</h2></div><button class="close-clean" id="close-tickets-modal"><i class="fas fa-times"></i></button></div>
+            <div class="clean-balance"><div class="balance-icon"><i class="fas fa-coins"></i></div><div class="balance-text"><span class="label">Points</span><span class="amount" id="tickets-points-count">0</span></div></div>
+            <div class="clean-rewards-grid" id="tickets-grid"></div>
+        </div>
+    </div>
+
+    <!-- TICKET CONFIRMATION -->
+    <div id="ticket-confirm-modal" class="modal">
+        <div class="modal-content ticket-confirm-content">
+            <div class="ticket-success-header"><i class="fas fa-check-circle"></i><h2>Ticket Redeemed!</h2><p>Show QR at Tourism Office</p></div>
+            <div class="ticket-display">
+                <div class="ticket-qr"><img id="ticket-qr-img" src=""></div>
+                <div class="ticket-details">
+                    <div class="ticket-row"><span>Code:</span><strong id="ticket-code-display"></strong></div>
+                    <div class="ticket-row"><span>Item:</span><strong id="ticket-item-display"></strong></div>
+                    <div class="ticket-row"><span>Holder:</span><strong id="ticket-holder-display"></strong></div>
+                    <div class="ticket-row"><span>Status:</span><strong class="status-active">ACTIVE</strong></div>
+                </div>
+            </div>
+            <div class="ticket-actions"><button id="download-ticket-btn" class="btn-primary">Save Ticket</button><button id="close-ticket-confirm" class="btn-secondary">Close</button></div>
+        </div>
+    </div>
+
+    <!-- SPOT DETAILS MODAL -->
+    <div id="spot-details-modal" class="modal">
+        <div class="modal-content detail-modal-clean">
+            <div class="detail-image-wrapper"><img id="spot-detail-img" src=""><button class="detail-close-btn" id="close-spot-modal"><i class="fas fa-times"></i></button><div class="detail-category-badge" id="spot-detail-category"></div></div>
+            <div class="detail-body">
+                <h2 class="detail-title" id="spot-detail-title"></h2>
+                <div class="detail-meta-row"><span class="meta-item rating"><i class="fas fa-star"></i><span id="spot-detail-rating">0.0</span> <span id="spot-review-count">(0)</span></span><span class="meta-item location"><i class="fas fa-map-marker-alt"></i><span id="spot-detail-location"></span></span></div>
+                <p class="detail-description" id="spot-detail-description"></p>
+                <div class="detail-features-section"><h3 class="features-title">What to Expect</h3><ul class="feature-list" id="spot-detail-features"></ul></div>
+                <div class="reviews-section">
+                    <h3 class="features-title"><i class="fas fa-comments"></i> User Ratings & Comments</h3>
+                    <div class="review-form">
+                        <div class="star-rating-input" id="spot-star-input"><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                        <textarea id="spot-comment-input" placeholder="Write a comment..." rows="2" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;"></textarea>
+                        <button class="btn-primary" id="submit-spot-review" style="width: auto; align-self: flex-end;">Post Review</button>
+                    </div>
+                    <div class="review-list" id="spot-reviews-list"></div>
+                </div>
+                <div class="detail-actions-row">
+                    <button class="btn-detail-primary" id="scan-qr-visit-btn"><i class="fas fa-qrcode"></i> Scan QR to Get Points</button>
+                    <button class="btn-detail-secondary" id="share-spot-btn"><i class="fas fa-share-alt"></i> Share</button>
+                </div>
+                <div id="admin-qr-actions" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #e2e8f0;">
+                    <button class="btn-primary" id="admin-generate-qr-btn" style="background: var(--purple);"><i class="fas fa-qrcode"></i> Generate/View Spot QR Code</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCT DETAILS MODAL -->
+    <div id="product-details-modal" class="modal">
+        <div class="modal-content detail-modal-clean">
+            <div class="detail-image-wrapper"><img id="product-detail-img" src=""><button class="detail-close-btn" id="close-product-modal"><i class="fas fa-times"></i></button><div class="detail-category-badge product-badge" id="product-detail-category"></div></div>
+            <div class="detail-body">
+                <h2 class="detail-title" id="product-detail-name"></h2>
+                <div class="detail-meta-row"><span class="meta-item price"><i class="fas fa-tag"></i><span id="product-detail-price"></span></span><span class="meta-item rating"><i class="fas fa-star"></i><span id="product-detail-rating">0.0</span> <span id="product-review-count">(0)</span></span></div>
+                <p class="detail-description" id="product-detail-description"></p>
+                <div class="detail-features-section"><h3 class="features-title">Product Details</h3><ul class="feature-list" id="product-detail-features"></ul></div>
+                <div class="reviews-section">
+                    <h3 class="features-title"><i class="fas fa-comments"></i> User Ratings & Comments</h3>
+                    <div class="review-form">
+                        <div class="star-rating-input" id="product-star-input"><i class="fas fa-star" data-value="1"></i><i class="fas fa-star" data-value="2"></i><i class="fas fa-star" data-value="3"></i><i class="fas fa-star" data-value="4"></i><i class="fas fa-star" data-value="5"></i></div>
+                        <textarea id="product-comment-input" placeholder="Write a comment..." rows="2" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;"></textarea>
+                        <button class="btn-primary" id="submit-product-review" style="width: auto; align-self: flex-end; background: var(--secondary);">Post Review</button>
+                    </div>
+                    <div class="review-list" id="product-reviews-list"></div>
+                </div>
+                <div class="detail-actions-row"><button class="btn-detail-primary" id="buy-product-btn"><i class="fas fa-shopping-cart"></i> Buy Now</button><button class="btn-detail-secondary" id="share-product-btn"><i class="fas fa-share-alt"></i> Share</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD SPOT MODAL -->
+    <div id="add-spot-modal" class="modal"><div class="modal-content" style="max-width: 600px; text-align: left; max-height: 90vh; overflow-y: auto;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3 style="color: var(--primary);">Add New Tourist Spot</h3><button class="close-modal-btn" id="close-add-spot-modal" style="font-size: 1.5rem; cursor: pointer;"><i class="fas fa-times"></i></button></div>
+        <form id="add-spot-form">
+            <div class="input-group"><label>Spot Name</label><input type="text" name="name" required></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><div class="input-group"><label>Category</label><select name="category" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px;"><option value="nature">Nature</option><option value="adventure">Adventure</option><option value="cultural">Cultural</option></select></div><div class="input-group"><label>Location</label><input type="text" name="location" required></div></div>
+            <div class="input-group"><label>Points Reward</label><input type="number" name="points_reward" required></div>
+            <div class="input-group"><label>Upload Image</label><div class="file-input-wrapper"><label class="file-input-label" for="add-spot-image"><i class="fas fa-cloud-upload-alt"></i> Choose Image</label><input type="file" id="add-spot-image" name="image_file" accept="image/*" required></div><img id="add-spot-image-preview" class="img-preview"></div>
+            <div class="input-group"><label>Description</label><textarea name="description" rows="3" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px;"></textarea></div>
+            <div class="input-group"><label>Features (comma separated)</label><input type="text" name="features" required></div>
+            <button type="submit" class="btn-primary">Save Spot</button>
+        </form>
+    </div></div>
+
+    <!-- EDIT SPOT MODAL -->
+    <div id="edit-spot-modal" class="modal"><div class="modal-content" style="max-width: 600px; text-align: left; max-height: 90vh; overflow-y: auto;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3 style="color: var(--primary);">Edit Tourist Spot</h3><button class="close-modal-btn" id="close-edit-spot-modal" style="font-size: 1.5rem; cursor: pointer;"><i class="fas fa-times"></i></button></div>
+        <form id="edit-spot-form">
+            <input type="hidden" name="id" id="edit-spot-id">
+            <div class="input-group"><label>Spot Name</label><input type="text" name="name" id="edit-spot-name" required></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><div class="input-group"><label>Category</label><select name="category" id="edit-spot-category" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px;"><option value="nature">Nature</option><option value="adventure">Adventure</option><option value="cultural">Cultural</option></select></div><div class="input-group"><label>Location</label><input type="text" name="location" id="edit-spot-location" required></div></div>
+            <div class="input-group"><label>Points Reward</label><input type="number" name="points_reward" id="edit-spot-points" required></div>
+            <div class="input-group"><label>New Image (Optional)</label><div class="file-input-wrapper"><label class="file-input-label" for="edit-spot-image"><i class="fas fa-cloud-upload-alt"></i> Choose Image</label><input type="file" id="edit-spot-image" name="image_file" accept="image/*"></div><img id="edit-spot-image-preview" class="img-preview"></div>
+            <div class="input-group"><label>Description</label><textarea name="description" id="edit-spot-desc" rows="3" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px;"></textarea></div>
+            <div class="input-group"><label>Features</label><input type="text" name="features" id="edit-spot-features" required></div>
+            <button type="submit" class="btn-primary">Update Spot</button>
+        </form>
+    </div></div>
+
+    <!-- ADD PRODUCT MODAL -->
+    <div id="add-product-modal" class="modal"><div class="modal-content" style="max-width: 600px; text-align: left; max-height: 90vh; overflow-y: auto;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3 style="color: var(--secondary);">Add New Product</h3><button class="close-modal-btn" id="close-add-product-modal" style="font-size: 1.5rem; cursor: pointer;"><i class="fas fa-times"></i></button></div>
+        <form id="add-product-form">
+            <div class="input-group"><label>Product Name</label><input type="text" name="name" required></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><div class="input-group"><label>Category</label><select name="category" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px;"><option value="food">Food</option><option value="crafts">Crafts</option><option value="souvenirs">Souvenirs</option></select></div><div class="input-group"><label>Location</label><input type="text" name="location" required></div></div>
+            <div class="input-group"><label>Price</label><input type="number" step="0.01" name="price" required></div>
+            <div class="input-group"><label>Upload Image</label><div class="file-input-wrapper"><label class="file-input-label" for="add-product-image"><i class="fas fa-cloud-upload-alt"></i> Choose Image</label><input type="file" id="add-product-image" name="image_file" accept="image/*" required></div><img id="add-product-image-preview" class="img-preview"></div>
+            <div class="input-group"><label>Description</label><textarea name="description" rows="3" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px;"></textarea></div>
+            <div class="input-group"><label>Features</label><input type="text" name="features" required></div>
+            <button type="submit" class="btn-primary" style="background: var(--secondary);">Save Product</button>
+        </form>
+    </div></div>
+
+    <!-- EDIT PRODUCT MODAL -->
+    <div id="edit-product-modal" class="modal"><div class="modal-content" style="max-width: 600px; text-align: left; max-height: 90vh; overflow-y: auto;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3 style="color: var(--secondary);">Edit Product</h3><button class="close-modal-btn" id="close-edit-product-modal" style="font-size: 1.5rem; cursor: pointer;"><i class="fas fa-times"></i></button></div>
+        <form id="edit-product-form">
+            <input type="hidden" name="id" id="edit-product-id">
+            <div class="input-group"><label>Product Name</label><input type="text" name="name" id="edit-product-name" required></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><div class="input-group"><label>Category</label><select name="category" id="edit-product-category" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px;"><option value="food">Food</option><option value="crafts">Crafts</option><option value="souvenirs">Souvenirs</option></select></div><div class="input-group"><label>Location</label><input type="text" name="location" id="edit-product-location" required></div></div>
+            <div class="input-group"><label>Price</label><input type="number" step="0.01" name="price" id="edit-product-price" required></div>
+            <div class="input-group"><label>New Image (Optional)</label><div class="file-input-wrapper"><label class="file-input-label" for="edit-product-image"><i class="fas fa-cloud-upload-alt"></i> Choose Image</label><input type="file" id="edit-product-image" name="image_file" accept="image/*"></div><img id="edit-product-image-preview" class="img-preview"></div>
+            <div class="input-group"><label>Description</label><textarea name="description" id="edit-product-desc" rows="3" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px;"></textarea></div>
+            <div class="input-group"><label>Features</label><input type="text" name="features" id="edit-product-features" required></div>
+            <button type="submit" class="btn-primary" style="background: var(--secondary);">Update Product</button>
+        </form>
+    </div></div>
+
+    <!-- MAIN APP -->
+    <div class="container">
+        <header>
+            <div class="logo"><i class="fas fa-compass"></i><h1>Tourgo</h1></div>
+            <nav><ul id="navigation-menu">
+                <li><a href="#" class="active" data-page="dashboard">Dashboard</a></li>
+                <li><a href="#" data-page="spots">Spots</a></li>
+                <li><a href="#" data-page="products">Products</a></li>
+                <li><a href="#" data-page="mytickets">My Tickets</a></li>
+                <li><a href="#" data-page="records">Records</a></li>
+                <li><a href="#" data-page="admin-reviews" id="nav-admin-reviews" style="display: none;">Place Reviews</a></li>
+                <li><a href="#" data-page="analytics" id="nav-analytics" style="display: none;">Analytics</a></li>
+                <li><a href="#" data-page="map">Map</a></li>
+            </ul></nav>
+            <div class="top-right-actions">
+                <button id="qr-scan-btn-main" class="top-right-btn" style="display: none;"><i class="fas fa-qrcode"></i> Scan QR</button>
+                <button id="notification-bell" class="top-right-btn notification-bell" style="display: none;"><i class="fas fa-bell"></i><span id="notification-count" class="notification-badge">0</span></button>
+                <button id="logout-btn" class="top-right-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <h2>Quick Actions</h2>
+                
+                <div class="profile-section">
+                    <button class="profile-btn" id="open-profile-btn">
+                        <div class="profile-avatar-wrapper">
+                            <img id="sidebar-profile-img" src="https://i.pravatar.cc/150?u=ken" alt="Profile">
+                            <div class="profile-edit-overlay"><i class="fas fa-camera"></i></div>
+                        </div>
+                        <div class="profile-info">
+                            <div class="profile-name" id="user-name">User</div>
+                            <div class="profile-role" id="user-role">Role</div>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="points-display">
+                    <div class="points-label">Your Points</div>
+                    <div class="points-value"><i class="fas fa-coins"></i> <span id="points-count">0</span></div>
+                </div>
+
+                <div class="quick-actions" style="margin-top: 20px;">
+                    <!-- Add Record Button REMOVED as requested -->
+                    <button class="action-btn" id="tickets-btn"><i class="fas fa-ticket-alt"></i><span>Tickets</span></button>
+                    <button class="action-btn" id="redeem-btn"><i class="fas fa-gift"></i><span>Redeem</span></button>
+                    <button class="action-btn" id="analytics-btn" style="display: none;"><i class="fas fa-chart-line"></i><span>Analytics</span></button>
+                    <button class="action-btn" id="explore-btn"><i class="fas fa-map-marked-alt"></i><span>Map</span></button>
+                    <button class="action-btn" id="my-tickets-btn"><i class="fas fa-wallet"></i><span>My Tickets</span></button>
+                    <button class="action-btn" id="admin-reviews-btn" style="display: none;"><i class="fas fa-comments"></i><span>Place Reviews</span></button>
+                </div>
+                <div style="margin-top: 30px;"><h2>Recent Activity</h2><div class="activity-list" id="activity-list"></div></div>
+            </div>
+            
+            <div class="content-area">
+                <!-- DASHBOARD -->
+                <div id="dashboard-view" class="page-content active">
+                    <div class="dashboard-cards">
+                        <div class="card"><div class="card-header"><div class="card-icon icon-teal"><i class="fas fa-users"></i></div><div class="card-title">Total Visitors</div></div><div class="card-value">12,489</div><div class="card-stats"><span class="positive">+12.5%</span> from last month</div></div>
+                        <div class="card"><div class="card-header"><div class="card-icon icon-orange"><i class="fas fa-map-marker-alt"></i></div><div class="card-title">Attractions</div></div><div class="card-value" id="dash-attractions-count">0</div><div class="card-stats"><span class="positive">Active spots</span></div></div>
+                        <div class="card"><div class="card-header"><div class="card-icon icon-amber"><i class="fas fa-coins"></i></div><div class="card-title">Points Collected</div></div><div class="card-value">45,670</div><div class="card-stats"><span class="positive">+8.2%</span> from last month</div></div>
+                        <div class="card"><div class="card-header"><div class="card-icon icon-purple"><i class="fas fa-ticket-alt"></i></div><div class="card-title">Tickets Issued</div></div><div class="card-value" id="tickets-issued-count">0</div><div class="card-stats"><span class="positive">Active today</span></div></div>
+                    </div>
+                    <div class="tourist-info-section" style="margin-top: 20px;"><h2 id="welcome-msg">Welcome to Tourgo!</h2><p>Track your visits, earn points, and explore Naguilian, La Union!</p></div>
+                </div>
+
+                <!-- SPOTS -->
+                <div id="spots-view" class="page-content">
+                    <div class="spots-section">
+                        <div class="section-header"><h2><i class="fas fa-camera"></i> Tourist Spots in Naguilian</h2><button class="btn-primary admin-only-btn" id="open-add-spot-btn" style="width:auto; padding: 10px 20px;"><i class="fas fa-plus"></i> Add Spot</button></div>
+                        <div class="spots-grid" id="spots-grid"></div>
+                    </div>
+                </div>
+
+                <!-- PRODUCTS -->
+                <div id="products-view" class="page-content">
+                    <div class="products-section">
+                        <div class="section-header"><h2><i class="fas fa-shopping-bag"></i> Local Products</h2><button class="btn-primary admin-only-btn" id="open-add-product-btn" style="width:auto; padding: 10px 20px; background: var(--secondary);"><i class="fas fa-plus"></i> Add Product</button></div>
+                        <div class="products-grid" id="products-grid"></div>
+                    </div>
+                </div>
+
+                <!-- MY TICKETS -->
+                <div id="mytickets-view" class="page-content">
+                    <div class="mytickets-section"><div class="section-header"><h2><i class="fas fa-wallet"></i> My Tickets</h2></div><div class="mytickets-grid" id="mytickets-grid"></div></div>
+                </div>
+
+                <!-- ADMIN PLACE REVIEWS -->
+                <div id="admin-reviews-view" class="page-content">
+                    <div class="admin-tickets-section">
+                        <div class="section-header"><h2><i class="fas fa-map-marked-alt"></i> Place Reviews & Feedback</h2><p class="section-subtitle">Click on any place to see detailed reviews, ratings, and summaries</p></div>
+                        <div class="places-reviews-grid" id="places-reviews-grid"></div>
+                    </div>
+                </div>
+
+                <!-- RECORDS -->
+                <div id="records-view" class="page-content">
+                    <div class="records-table-container"><div class="section-header"><h2>Tourism Records</h2><button id="add-record-table-btn" class="btn-primary" style="width:auto; padding: 10px 20px;"><i class="fas fa-plus"></i> Add New</button></div><table class="records-table"><thead><tr><th>ID</th><th>Location</th><th>Visitors</th><th>Date</th><th>Actions</th></tr></thead><tbody id="records-tbody"></tbody></table></div>
+                </div>
+
+                <!-- ANALYTICS -->
+                <div id="analytics-view" class="page-content">
+                    <div class="analytics-section">
+                        <div class="section-header">
+                            <h2>Visitor Analytics</h2>
+                            <div style="display: flex; gap: 15px; align-items: center;">
+                                <div class="control-group">
+                                    <label style="font-weight: 600; color: var(--dark);">Year:</label>
+                                    <select id="analytics-year" style="padding: 8px 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem; background: white; cursor: pointer;">
+                                        <option value="2025">2025</option>
+                                        <option value="2026" selected>2026</option>
+                                    </select>
+                                </div>
+                                <button id="analyze-btn" class="btn-primary" style="width:auto; padding: 10px 20px;"><i class="fas fa-sync"></i> Refresh</button>
+                            </div>
+                        </div>
+                        <div class="analytics-summary">
+                            <div class="summary-card"><div class="summary-icon"><i class="fas fa-users"></i></div><div class="summary-info"><span class="summary-label">Total Visitors</span><h3 class="summary-value" id="total-year-visitors">0</h3></div></div>
+                            <div class="summary-card"><div class="summary-icon"><i class="fas fa-trophy"></i></div><div class="summary-info"><span class="summary-label">Most Visited</span><h3 class="summary-value small" id="most-visited-place">-</h3><span class="summary-change" id="most-visited-count">0 visitors</span></div></div>
+                            <div class="summary-card"><div class="summary-icon"><i class="fas fa-calendar"></i></div><div class="summary-info"><span class="summary-label">Peak Month</span><h3 class="summary-value small" id="peak-month">-</h3><span class="summary-change" id="peak-month-count">0 visitors</span></div></div>
+                        </div>
+                        <div class="charts-grid">
+                            <div class="chart-box"><div class="chart-title"><i class="fas fa-chart-bar"></i><h3>Monthly Visitors</h3></div><canvas id="monthlyChart"></canvas></div>
+                            <div class="chart-box"><div class="chart-title"><i class="fas fa-chart-pie"></i><h3>By Location</h3></div><canvas id="locationChart"></canvas></div>
+                            <div class="chart-box full-width"><div class="chart-title"><i class="fas fa-chart-line"></i><h3>Trends</h3></div><canvas id="trendChart"></canvas></div>
+                        </div>
+                        <div class="analytics-table-section" style="margin-top: 20px;">
+                            <h3><i class="fas fa-ranking-star"></i> Top Visited Places</h3>
+                            <table class="analytics-table">
+                                <thead><tr><th>Rank</th><th>Location</th><th>Total Visitors</th><th>Percentage</th><th>Trend</th></tr></thead>
+                                <tbody id="analytics-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAP -->
+                <div id="map-view" class="page-content">
+                    <div class="map-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-map-marked-alt"></i> Interactive Map of Naguilian, La Union</h2>
+                            <div class="map-filter-tabs">
+                                <button class="map-filter-btn active" data-category="all"><i class="fas fa-globe"></i> All</button>
+                                <button class="map-filter-btn" data-category="nature"><i class="fas fa-leaf"></i> Nature</button>
+                                <button class="map-filter-btn" data-category="adventure"><i class="fas fa-hiking"></i> Adventure</button>
+                                <button class="map-filter-btn" data-category="cultural"><i class="fas fa-landmark"></i> Cultural</button>
+                            </div>
+                        </div>
+                        <div class="weather-widget" id="weather-widget"><div class="weather-loading"><i class="fas fa-spinner fa-spin"></i><span>Loading Naguilian weather...</span></div></div>
+                        <div class="map-wrapper">
+                            <div id="interactive-map" class="interactive-map"></div>
+                            <div class="map-sidebar" id="map-sidebar">
+                                <div class="sidebar-header"><h3 id="sidebar-title"><i class="fas fa-map-pin"></i> Select a location</h3><button id="close-sidebar" class="close-sidebar-btn"><i class="fas fa-times"></i></button></div>
+                                <div class="sidebar-content" id="sidebar-content"><div class="empty-sidebar"><i class="fas fa-map-marker-alt"></i><p>Click a pin to view details</p></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('Tourgo App Registered!', reg))
+                    .catch(err => console.log('App Registration Failed', err));
+            });
+        }
+    </script>
+</body>
+</html>
