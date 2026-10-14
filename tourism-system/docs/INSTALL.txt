@@ -1,0 +1,53 @@
+NOTE (October 2026): the project is now organized in folders. PHP files such as weather_api.php are in api/.
+See docs/README.md for the full layout.
+
+SEARCH BARS + SAVED DAILY WEATHER  (Tourgo)
+==========================================
+
+Files in this zip
+-----------------
+weather_api.php      new  -> upload next to analytics_api.php
+search-weather.js    new  -> upload next to script.js
+search-weather.css   new  -> upload next to styles.css
+
+Step 1: upload the 3 files to the same folder as index.html
+-----------------------------------------------------------
+
+Step 2: edit index.html (2 small changes, nothing else changes)
+---------------------------------------------------------------
+A) In <head>, right under the line:
+       <link rel="stylesheet" href="styles.css?v=6">
+   add:
+       <link rel="stylesheet" href="search-weather.css?v=1">
+
+B) At the bottom, right under the line:
+       <script src="script.js?v=10"></script>
+   add:
+       <script src="search-weather.js?v=1"></script>
+
+Step 3: refresh the page (Ctrl+F5, or clear the site data on your phone)
+------------------------------------------------------------------------
+If you use the installed app (PWA), the old files may be cached by service-worker.js.
+Close the app fully and reopen it, or bump the cache name inside service-worker.js.
+
+What you get
+------------
+1. Spots page and Products page: a search bar under the title. It matches name, place,
+   category, description and features. Several words work (example: "falls nature").
+2. Admin > Analytics: a new "Day review & weather" box. Pick a day (or tap Today / Yesterday /
+   any row) and it shows that day's weather (high, low, rain, wind) together with that day's
+   visitors, QR check-ins and which places were busy.
+
+How the weather is saved
+------------------------
+- The first time the admin opens Analytics (and every time after, or when pressing Refresh),
+  weather_api.php downloads the last 60 days + today from Open-Meteo (free, no key) and stores
+  one row per day in a new table called weather_log. The table is created automatically.
+- Days are never deleted, so after a while you have a permanent weather history.
+- Weather is for Naguilian (16.5314, 120.3941). To change the place, edit WX_LAT / WX_LON
+  at the top of weather_api.php.
+- Open-Meteo is called from your server (PHP), so the host must allow outgoing connections
+  (cURL or allow_url_fopen). If it cannot connect, the box tells you and still shows saved days.
+
+Note: because weather is only saved when the admin opens Analytics, a day more than 60 days
+old that was never saved cannot be filled in later.
